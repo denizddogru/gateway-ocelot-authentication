@@ -1,33 +1,12 @@
+﻿namespace OcelotApiGatewayDemo;
+
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Ocelot.DependencyInjection;
-using Ocelot.Middleware;
+using System.Linq;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
-
-var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-builder.Services.AddControllers();
-
-// Register the API key authentication scheme
-builder.Services.AddAuthentication("ApiKey")
-    .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>("ApiKey", null);
-
-// Add Ocelot
-builder.Configuration.AddJsonFile("ocelot.json", optional: false, reloadOnChange: true);
-builder.Services.AddOcelot();
-
-var app = builder.Build();
-
-// Use authentication and authorization
-app.UseAuthentication();
-app.UseAuthorization();
-
-// Use Ocelot
-await app.UseOcelot();
-
-app.Run();
+using System.Threading.Tasks;
 
 public class ApiKeyAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {

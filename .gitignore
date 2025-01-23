@@ -1,0 +1,10 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/DemoApi/bin/Debug/net8.0
+/DemoApi/obj/Debug/net8.0/ref
+/DemoApi/obj/Debug/net8.0/refint
+/DemoApi/obj/Debug/net8.0/staticwebassets
+*.exe
+/OcelotApiGatewayDemo/bin/Debug/net8.0
