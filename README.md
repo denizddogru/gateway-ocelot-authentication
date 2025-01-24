@@ -1,13 +1,13 @@
 # API Gateway with Ocelot and Authentication
 
-This project demonstrates how to build an **API Gateway** using **Ocelot** and implement **authentication** using **API Key** and **No Authentication**. Future updates will include **JWT** and **OAuth2** authentication.
+This project demonstrates how to build an **API Gateway** using **Ocelot** and implement **authentication** using **API Key** and **JWT**. Future updates will include **OAuth2** authentication.
 
 ## Features
 
 - **API Gateway**: Built using **Ocelot** to route requests to downstream services. Supports multiple authentication schemes.
 - **Authentication**: 
   - **API Key Authentication**: Requests must include a valid API key in the `X-API-KEY` header
-  - **No Authentication**: Public endpoints that do not require authentication
+  - **JWT Authentication**: Secure endpoints that do  require JWT authentication
   - **Future Additions**: JWT Authentication and OAuth2 Authentication integration
 
 ## Prerequisites
@@ -15,15 +15,7 @@ This project demonstrates how to build an **API Gateway** using **Ocelot** and i
 - [Postman](https://www.postman.com/downloads/) (or any API testing tool)
 - [Visual Studio 2022](https://visualstudio.microsoft.com/) (or any code editor)
 
-## Project Structure
-1. **Demo.API**:
-   - Simple API with public and authenticated endpoints
-   - Endpoints:
-     - `/api/demo/public` (No Authentication)
-     - `/api/demo/test` (API Key Authentication)
-2. **OcelotApiGatewayDemo**:
-   - API Gateway built using Ocelot
-   - Handles API key authentication and routes requests
+
 
 ## Setup
 
