@@ -43,16 +43,17 @@ The API Gateway will be available at: `http://localhost:7295`
 
 ## Testing the API
 
-### Public Endpoint (No Authentication)
+### JWT Authentication
 **Request**:
 ```
-GET http://localhost:7295/gateway/public
+Retrieve Access Token from login, and then insert the token to the Header ( Bearer )
+GET http://localhost:7295/gateway/secure
 ```
 
 **Response**:
 ```json
 {
-  "message": "Hello from Demo API (Public Endpoint)!"
+  "message": "Hello from Demo API (JWT Auth)!"
 }
 ```
 
@@ -80,7 +81,7 @@ Note: If the `X-API-KEY` header is missing or invalid, the gateway will return a
 {
   "Routes": [
     {
-      "DownstreamPathTemplate": "/api/demo/{everything}",
+      "DownstreamPathTemplate": "/api/demo/test",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
@@ -88,9 +89,25 @@ Note: If the `X-API-KEY` header is missing or invalid, the gateway will return a
           "Port": 5000
         }
       ],
-      "UpstreamPathTemplate": "/gateway/{everything}",
+      "UpstreamPathTemplate": "/gateway/demo",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/demo/secure/test",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5001
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/secure",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
     }
+  
   ],
   "GlobalConfiguration": {
     "BaseUrl": "http://localhost:7295"
