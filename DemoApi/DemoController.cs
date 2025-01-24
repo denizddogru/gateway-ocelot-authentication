@@ -15,6 +15,21 @@ public class DemoController : ControllerBase
         return Ok(new { Message = "Hello from Demo API (API Key Authentication)!" });
     }
 
+    [HttpGet("secure/test")]
+    [Authorize(AuthenticationSchemes = "Bearer")] // JWT Bearer authentication
+    public IActionResult GetSecureTest()
+    {
+        // User bilgisine erişebilirsiniz
+        var userName = User.Identity.Name;
+        var userClaims = User.Claims;
+
+        return Ok(new
+        {
+            Message = "Hello from Secure Endpoint!",
+            User = userName,
+            Claims = userClaims.Select(c => new { c.Type, c.Value })
+        });
+    }
 }
 
 
