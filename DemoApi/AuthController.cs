@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 using static DemoApi.TokenService;
 
@@ -39,5 +41,35 @@ public class AuthController : ControllerBase
         }
 
         return Unauthorized();
+    }
+
+    [HttpGet("google-login")]
+    public IActionResult GoogleLogin()
+    {
+        var properties = new AuthenticationProperties
+        {
+            RedirectUri = "https://localhost:5001/signin-google",
+            Items =
+        {
+            {"returnUrl", "/gateway/secure/test"}
+        }
+        };
+
+        return Challenge(properties, GoogleDefaults.AuthenticationScheme);
+    }
+
+
+    [HttpGet("signin-google")]
+    public async Task<IActionResult> GoogleCallback()
+    {
+        var authenticateResult = await HttpContext.AuthenticateAsync("Google");
+
+        if (!authenticateResult.Succeeded)
+            return Unauthorized();
+
+        var claims = authenticateResult.Principal.Claims;
+        var token = _tokenService.GenerateAccessToken(claims);
+
+        return Ok(new { token });
     }
 }

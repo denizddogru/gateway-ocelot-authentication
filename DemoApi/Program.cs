@@ -13,6 +13,18 @@ builder.Services.AddControllers();
 // Register the API key authentication scheme
 builder.Services.AddAuthentication("ApiKey")
     .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>("ApiKey", null)
+    .AddGoogle(options =>
+    {
+        options.ClientId  = builder.Configuration["Authentication:Google:ClientId"];
+        options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+
+        // Callback URL'i belirtin
+        options.CallbackPath = "/signin-google";
+
+        // Scopes
+        options.Scope.Add("email");
+        options.Scope.Add("profile");
+    })
     .AddJwtBearer("Bearer", options =>
     {
         var tokenPreferences = builder.Configuration

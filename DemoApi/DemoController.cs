@@ -16,20 +16,18 @@ public class DemoController : ControllerBase
     }
 
     [HttpGet("secure/test")]
-    [Authorize(AuthenticationSchemes = "Bearer")] // JWT Bearer authentication
+    [Authorize(AuthenticationSchemes = "Bearer")]
     public IActionResult GetSecureTest()
     {
-        // User bilgisine erişebilirsiniz
-        var userName = User.Identity.Name;
-        var userClaims = User.Claims;
-
+        var email = User.FindFirst("email")?.Value;
         return Ok(new
         {
-            Message = "Hello from Secure Endpoint!",
-            User = userName,
-            Claims = userClaims.Select(c => new { c.Type, c.Value })
+            Message = "Authenticated with Google!",
+            Email = email
         });
     }
+
+
 }
 
 
