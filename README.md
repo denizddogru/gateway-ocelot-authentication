@@ -1,13 +1,13 @@
 # API Gateway with Ocelot and Authentication
 
-This project demonstrates how to build an **API Gateway** using **Ocelot** and implement **authentication** using **API Key** and **No Authentication**. Future updates will include **JWT** and **OAuth2** authentication.
+This project demonstrates how to build an **API Gateway** using **Ocelot** and implement **authentication** using **API Key** and **JWT**. Future updates will include **OAuth2** authentication.
 
 ## Features
 
 - **API Gateway**: Built using **Ocelot** to route requests to downstream services. Supports multiple authentication schemes.
 - **Authentication**: 
   - **API Key Authentication**: Requests must include a valid API key in the `X-API-KEY` header
-  - **No Authentication**: Public endpoints that do not require authentication
+  - **JWT Authentication**: Secure endpoints that do  require JWT authentication
   - **Future Additions**: JWT Authentication and OAuth2 Authentication integration
 
 ## Prerequisites
@@ -15,15 +15,7 @@ This project demonstrates how to build an **API Gateway** using **Ocelot** and i
 - [Postman](https://www.postman.com/downloads/) (or any API testing tool)
 - [Visual Studio 2022](https://visualstudio.microsoft.com/) (or any code editor)
 
-## Project Structure
-1. **Demo.API**:
-   - Simple API with public and authenticated endpoints
-   - Endpoints:
-     - `/api/demo/public` (No Authentication)
-     - `/api/demo/test` (API Key Authentication)
-2. **OcelotApiGatewayDemo**:
-   - API Gateway built using Ocelot
-   - Handles API key authentication and routes requests
+
 
 ## Setup
 
@@ -51,16 +43,17 @@ The API Gateway will be available at: `http://localhost:7295`
 
 ## Testing the API
 
-### Public Endpoint (No Authentication)
+### JWT Authentication
 **Request**:
 ```
-GET http://localhost:7295/gateway/public
+Retrieve Access Token from login, and then insert the token to the Header ( Bearer )
+GET http://localhost:7295/gateway/secure
 ```
 
 **Response**:
 ```json
 {
-  "message": "Hello from Demo API (Public Endpoint)!"
+  "message": "Hello from Demo API (JWT Auth)!"
 }
 ```
 
@@ -88,7 +81,7 @@ Note: If the `X-API-KEY` header is missing or invalid, the gateway will return a
 {
   "Routes": [
     {
-      "DownstreamPathTemplate": "/api/demo/{everything}",
+      "DownstreamPathTemplate": "/api/demo/test",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
@@ -96,9 +89,25 @@ Note: If the `X-API-KEY` header is missing or invalid, the gateway will return a
           "Port": 5000
         }
       ],
-      "UpstreamPathTemplate": "/gateway/{everything}",
+      "UpstreamPathTemplate": "/gateway/demo",
       "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/demo/secure/test",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5001
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/secure",
+      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
     }
+  
   ],
   "GlobalConfiguration": {
     "BaseUrl": "http://localhost:7295"
