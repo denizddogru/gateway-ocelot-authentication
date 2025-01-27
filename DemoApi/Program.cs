@@ -1,65 +1,82 @@
 using DemoApi;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using OcelotApiGatewayDemo;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
 
-// Register the API key authentication scheme
-builder.Services.AddAuthentication("ApiKey")
-    .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>("ApiKey", null)
-    .AddGoogle(options =>
+// Configure Authentication
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.Authority = "https://accounts.google.com";
+    options.TokenValidationParameters = new TokenValidationParameters
     {
-        options.ClientId  = builder.Configuration["Authentication:Google:ClientId"];
-        options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+        ValidateIssuer = true,
+        ValidateAudience = true,  // ID Token için true yapabiliriz
+        ValidAudience = builder.Configuration["Authentication:Google:ClientId"],
+        ValidIssuer = "https://accounts.google.com",
+        ValidateIssuerSigningKey = true
+    };
+})
+.AddGoogle(options =>
+{
+    options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+    options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+    options.CallbackPath = "/signin-google";
+    options.Scope.Add("email");
+    options.Scope.Add("profile");
+})
+.AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>("ApiKey", null);
 
-        // Callback URL'i belirtin
-        options.CallbackPath = "/signin-google";
-
-        // Scopes
-        options.Scope.Add("email");
-        options.Scope.Add("profile");
-    })
-    .AddJwtBearer("Bearer", options =>
-    {
-        var tokenPreferences = builder.Configuration
-            .GetSection("TokenPreferences").Get<TokenPreferences>();
-
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = tokenPreferences.Issuer,
-            ValidAudience = tokenPreferences.Audience,
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(tokenPreferences.SecurityKey)),
-            ClockSkew = TimeSpan.Zero  // Token süresinin tam olarak uygulanmasý için
-        };
-    });
-
-// TokenPreferences'ý kaydet
+// Configure Services
 builder.Services.Configure<TokenPreferences>(
     builder.Configuration.GetSection("TokenPreferences"));
+builder.Services.AddScoped<ITokenService, TokenService>();
 
-// ITokenService'i kaydet
-builder.Services.AddScoped<ITokenService, TokenService>();  
-
-// Add Swagger
+// Configure Swagger
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Demo API", Version = "v1" });
+
+    // Add security definition for Bearer token
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Description = "JWT Authorization header using the Bearer scheme",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
 });
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure middleware pipeline
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -69,10 +86,8 @@ if (app.Environment.IsDevelopment())
     });
 }
 
-// Use authentication and authorization
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
