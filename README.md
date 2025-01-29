@@ -1,6 +1,6 @@
 # API Gateway with Ocelot and Authentication
 
-This project demonstrates how to build an **API Gateway** using **Ocelot** and implement **authentication** using **API Key** and **JWT**. Future updates will include **OAuth2** authentication.
+This project demonstrates how to build an **API Gateway** using **Ocelot** and implement **authentication** using **API Key**, **JWT** and **OAuth2.0**.
 
 ## Features
 
@@ -14,6 +14,7 @@ This project demonstrates how to build an **API Gateway** using **Ocelot** and i
 - [.NET 6 SDK](https://dotnet.microsoft.com/download/dotnet/6.0)
 - [Postman](https://www.postman.com/downloads/) (or any API testing tool)
 - [Visual Studio 2022](https://visualstudio.microsoft.com/) (or any code editor)
+- [Google.console](https://cloud.google.com)
 
 
 
@@ -72,7 +73,65 @@ X-API-KEY: test-api-key-123
 }
 ```
 
+
 Note: If the `X-API-KEY` header is missing or invalid, the gateway will return a `401 Unauthorized` response.
+
+# OAuth 2.0 Authentication Steps (Including Postman Testing)
+
+## Step 1: Open Postman and Create a New Request
+
+1. Open **Postman**.
+2. Create a new request to a **protected endpoint**.
+
+---
+
+## Step 2: Configure Authorization
+
+1. Go to the **Authorization** tab.
+2. Select **OAuth 2.0** as the type.
+3. Click **"Configure New Token"**.
+
+---
+
+## Step 3: Fill in OAuth 2.0 Configuration
+
+Enter the following details:
+
+```text
+Token Name: Any name
+Grant Type: Authorization Code
+Callback URL: https://oauth.pstmn.io/v1/callback
+Auth URL: https://accounts.google.com/o/oauth2/v2/auth
+Access Token URL: https://oauth2.googleapis.com/token
+Client ID: Your Google Client ID
+Client Secret: Your Google Client Secret
+Scope: email profile openid
+```
+
+---
+
+## Step 4: Get New Access Token
+Click "Get New Access Token".
+The Google login page will open.
+Sign in with your Google account.
+Grant permissions when prompted.
+You will be redirected back to Postman.
+
+---
+
+## Step 5: Postman Receives Tokens
+
+Postman will receive the following tokens:
+
+Access Token (Starts with ya29...)
+ID Token (Starts with eyJ...)
+Select the ID Token (not the Access Token).
+Click "Use Token".
+
+## Step 6: Send Request to Endpoint
+The token will be added as Bearer in the Authorization header.
+The request will be authenticated.
+The API will return the protected resource.
 
 ## Configuration
 
@@ -116,8 +175,4 @@ Note: If the `X-API-KEY` header is missing or invalid, the gateway will return a
 ```
 
 The API key is validated in the `ApiKeyAuthenticationHandler` class. Default API key: `test-api-key-123`
-
-## Future Updates
-
-- OAuth2 Authentication: Integration with OAuth2 providers ( google console)
 
