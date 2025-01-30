@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using OcelotApiGatewayDemo;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,31 +12,42 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 // Configure Authentication
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.Authority = "https://accounts.google.com";
-    options.TokenValidationParameters = new TokenValidationParameters
+builder.Services.AddAuthentication()
+    .AddJwtBearer("GoogleBearer", options =>
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,  // ID Token için true yapabiliriz
-        ValidAudience = builder.Configuration["Authentication:Google:ClientId"],
-        ValidIssuer = "https://accounts.google.com",
-        ValidateIssuerSigningKey = true
-    };
-})
-.AddGoogle(options =>
-{
-    options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
-    options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
-    options.CallbackPath = "/signin-google";
-    options.Scope.Add("email");
-    options.Scope.Add("profile");
-})
+        options.Authority = "https://accounts.google.com";
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidAudience = builder.Configuration["Authentication:Google:ClientId"],
+            ValidIssuer = "https://accounts.google.com",
+            ValidateIssuerSigningKey = true
+        };
+    })
+    .AddJwtBearer("CustomBearer", options =>
+    {
+        var tokenPreferences = builder.Configuration
+            .GetSection("TokenPreferences").Get<TokenPreferences>();
+
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = tokenPreferences.Issuer,
+            ValidAudience = tokenPreferences.Audience,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(tokenPreferences.SecurityKey))
+        };
+    })
+    .AddGoogle(options =>
+    {
+        options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+        options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+        options.CallbackPath = "/signin-google";
+    })
 .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>("ApiKey", null);
 
 // Configure Services

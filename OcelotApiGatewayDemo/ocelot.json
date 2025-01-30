@@ -12,11 +12,23 @@
       "UpstreamPathTemplate": "/gateway/google-test",
       "UpstreamHttpMethod": [ "GET" ],
       "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer"
+        "AuthenticationProviderKey": "GoogleBearer"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/demo/secure/test/jwt",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5001
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/jwt-test",
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "CustomBearer"
       }
     }
-  ],
-  "GlobalConfiguration": {
-    "BaseUrl": "https://localhost:7295"
-  }
+  ]
 }

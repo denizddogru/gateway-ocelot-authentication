@@ -9,14 +9,14 @@ using Microsoft.AspNetCore.Mvc;
 public class DemoController : ControllerBase
 {
     [HttpGet("test")]
-    [Authorize(AuthenticationSchemes = "ApiKey")] // Require API key authentication
+    [Authorize(AuthenticationSchemes = "ApiKey")]
     public IActionResult GetTest()
     {
         return Ok(new { Message = "Hello from Demo API (API Key Authentication)!" });
     }
 
     [HttpGet("secure/test")]
-    [Authorize(AuthenticationSchemes = "Bearer")]
+    [Authorize(AuthenticationSchemes = "GoogleBearer")]  // Google OAuth için güncellendi
     public IActionResult GetSecureTest()
     {
         var email = User.FindFirst("email")?.Value;
@@ -27,9 +27,20 @@ public class DemoController : ControllerBase
         });
     }
 
-
+    [HttpGet("secure/test/jwt")]
+    [Authorize(AuthenticationSchemes = "CustomBearer")]
+    public IActionResult GetSecureTestJwt()
+    {
+        var userName = User.Identity.Name;
+        var userClaims = User.Claims;
+        return Ok(new
+        {
+            Message = "Hello from Custom JWT Endpoint!",
+            User = userName,
+            Claims = userClaims.Select(c => new { c.Type, c.Value })
+        });
+    }
 }
-
 
 
 
