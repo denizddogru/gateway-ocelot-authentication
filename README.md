@@ -135,7 +135,7 @@ The API will return the protected resource.
 
 ## Configuration
 
-### Ocelot Configuration (ocelot.json)
+### Ocelot Configuration (ocelot.json) [This file can be updated while testing the program you can change the paths and save it and continue with requests]
 ```json
 {
   "Routes": [
