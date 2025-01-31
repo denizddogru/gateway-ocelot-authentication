@@ -9,7 +9,7 @@ This project demonstrates how to build an **API Gateway** using **Ocelot** and i
   - **API Key Authentication**: Requests must include a valid API key in the `X-API-KEY` header
   - **JWT Authentication**: Secure endpoints that do  require JWT authentication
   - **Identity Server4 Authentication**: Provides an implementation of the OAuth 2.0 and OpenID Connect (OIDC) protocols for ASP.NET Core
-  - **OAuth2.0 Authentication ( console cloud google ) The OAuth 2.0 token ensures that the request sent through Ocelot is authenticated and authorized to access the downstream API.
+  - **OAuth2.0 Authentication**: ( console cloud google ) The OAuth 2.0 token ensures that the request sent through Ocelot is authenticated and authorized to access the downstream API.
 
 ## Prerequisites
 - [.NET 6 SDK](https://dotnet.microsoft.com/download/dotnet/6.0)
@@ -100,11 +100,20 @@ This section explains how we implemented Identity Server integration with our AP
 **Request**:
 ```
 Retrieve Access Token from login, and then insert the token to the Header ( Bearer )
-GET http://localhost:7295/gateway/secure
+```
+POST https://localhost:5001/api/Auth/login 
+
+```
+{
+  "username": "demo",
+  "password": "demo123"
+}
 ```
 
+GET http://localhost:7295/gateway/secure 
 **Response**:
 ```json
+
 {
   "message": "Hello from Demo API (JWT Auth)!"
 }
@@ -127,7 +136,7 @@ X-API-KEY: test-api-key-123
   "message": "Hello from Demo API (API Key Authenticated)!"
 }
 ```
-
+The API key is validated in the `ApiKeyAuthenticationHandler` class. Default API key: `test-api-key-123`
 
 Note: If the `X-API-KEY` header is missing or invalid, the gateway will return a `401 Unauthorized` response.
 
@@ -245,5 +254,5 @@ The API will return the protected resource.
 
 ```
 
-The API key is validated in the `ApiKeyAuthenticationHandler` class. Default API key: `test-api-key-123`
+
 
