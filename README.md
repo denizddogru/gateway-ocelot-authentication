@@ -194,19 +194,7 @@ The API will return the protected resource.
 {
   "Routes": [
     {
-      "DownstreamPathTemplate": "/api/demo/test",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 5000
-        }
-      ],
-      "UpstreamPathTemplate": "/gateway/demo",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ]
-    },
-    {
-      "DownstreamPathTemplate": "/api/demo/secure/test",
+      "DownstreamPathTemplate": "/api/test/google-verify",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
@@ -214,18 +202,46 @@ The API will return the protected resource.
           "Port": 5001
         }
       ],
-      "UpstreamPathTemplate": "/gateway/secure",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE" ],
+      "UpstreamPathTemplate": "/gateway/google-test",
+      "UpstreamHttpMethod": [ "GET" ],
       "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer"
+        "AuthenticationProviderKey": "GoogleBearer"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/demo/secure/test/jwt",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5001
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/jwt-test",
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "CustomBearer"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/demo/secure/ids",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5001
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/ids-test",
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "IdentityServer"
       }
     }
-  
-  ],
-  "GlobalConfiguration": {
-    "BaseUrl": "http://localhost:7295"
-  }
+  ]
 }
+
+
 ```
 
 The API key is validated in the `ApiKeyAuthenticationHandler` class. Default API key: `test-api-key-123`
