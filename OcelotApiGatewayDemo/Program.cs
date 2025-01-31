@@ -42,6 +42,18 @@ builder.Services.AddAuthentication()
                 Encoding.UTF8.GetBytes(tokenPreferences.SecurityKey))
         };
     })
+        .AddJwtBearer("IdentityServer", options =>
+        {
+            options.Authority = "https://localhost:5005";
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidAudience = "demoapi"
+            };
+        })
     .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>("ApiKey", null);
 
 builder.Configuration.AddJsonFile("ocelot.json", optional: false, reloadOnChange: true);

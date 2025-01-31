@@ -29,6 +29,21 @@
       "AuthenticationOptions": {
         "AuthenticationProviderKey": "CustomBearer"
       }
+    },
+    {
+      "DownstreamPathTemplate": "/api/demo/secure/ids",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5001
+        }
+      ],
+      "UpstreamPathTemplate": "/gateway/ids-test",
+      "UpstreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "IdentityServer"
+      }
     }
   ]
 }

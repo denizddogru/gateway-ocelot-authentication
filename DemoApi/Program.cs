@@ -13,42 +13,58 @@ builder.Services.AddControllers();
 
 // Configure Authentication
 builder.Services.AddAuthentication()
-    .AddJwtBearer("GoogleBearer", options =>
-    {
-        options.Authority = "https://accounts.google.com";
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidAudience = builder.Configuration["Authentication:Google:ClientId"],
-            ValidIssuer = "https://accounts.google.com",
-            ValidateIssuerSigningKey = true
-        };
-    })
-    .AddJwtBearer("CustomBearer", options =>
-    {
-        var tokenPreferences = builder.Configuration
-            .GetSection("TokenPreferences").Get<TokenPreferences>();
-
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = tokenPreferences.Issuer,
-            ValidAudience = tokenPreferences.Audience,
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(tokenPreferences.SecurityKey))
-        };
-    })
-    .AddGoogle(options =>
-    {
-        options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
-        options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
-        options.CallbackPath = "/signin-google";
-    })
-.AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>("ApiKey", null);
+   // Google OAuth
+   .AddJwtBearer("GoogleBearer", options =>
+   {
+       options.Authority = "https://accounts.google.com";
+       options.TokenValidationParameters = new TokenValidationParameters
+       {
+           ValidateIssuer = true,
+           ValidateAudience = true,
+           ValidAudience = builder.Configuration["Authentication:Google:ClientId"],
+           ValidIssuer = "https://accounts.google.com",
+           ValidateIssuerSigningKey = true
+       };
+   })
+   // Custom JWT
+   .AddJwtBearer("CustomBearer", options =>
+   {
+       var tokenPreferences = builder.Configuration
+           .GetSection("TokenPreferences").Get<TokenPreferences>();
+       options.TokenValidationParameters = new TokenValidationParameters
+       {
+           ValidateIssuer = true,
+           ValidateAudience = true,
+           ValidateLifetime = true,
+           ValidateIssuerSigningKey = true,
+           ValidIssuer = tokenPreferences.Issuer,
+           ValidAudience = tokenPreferences.Audience,
+           IssuerSigningKey = new SymmetricSecurityKey(
+               Encoding.UTF8.GetBytes(tokenPreferences.SecurityKey))
+       };
+   })
+   // Identity Server
+   .AddJwtBearer("IdentityServer", options =>
+   {
+       options.Authority = "https://localhost:5005";
+       options.TokenValidationParameters = new TokenValidationParameters
+       {
+           ValidateIssuer = true,
+           ValidateAudience = true,
+           ValidateLifetime = true,
+           ValidateIssuerSigningKey = true,
+           ValidAudience = "demoapi"
+       };
+   })
+   // Google Sign-In
+   .AddGoogle(options =>
+   {
+       options.ClientId = builder.Configuration["Authentication:Google:ClientId"];
+       options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
+       options.CallbackPath = "/signin-google";
+   })
+   // API Key
+   .AddScheme<AuthenticationSchemeOptions, ApiKeyAuthenticationHandler>("ApiKey", null);
 
 // Configure Services
 builder.Services.Configure<TokenPreferences>(

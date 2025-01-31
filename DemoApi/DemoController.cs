@@ -40,6 +40,18 @@ public class DemoController : ControllerBase
             Claims = userClaims.Select(c => new { c.Type, c.Value })
         });
     }
+
+    [HttpGet("secure/ids")]
+    [Authorize(AuthenticationSchemes = "IdentityServer")]
+    public IActionResult GetSecureIdsTest()
+    {
+        var claims = User.Claims.Select(c => new { c.Type, c.Value });
+        return Ok(new
+        {
+            Message = "Authenticated with Identity Server!",
+            Claims = claims
+        });
+    }
 }
 
 
