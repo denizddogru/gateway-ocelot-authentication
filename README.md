@@ -8,7 +8,8 @@ This project demonstrates how to build an **API Gateway** using **Ocelot** and i
 - **Authentication**: 
   - **API Key Authentication**: Requests must include a valid API key in the `X-API-KEY` header
   - **JWT Authentication**: Secure endpoints that do  require JWT authentication
-  - **Identity Server4 Authentication**: Creates a bearer token, then the gateway uses that token
+  - **Identity Server4 Authentication**: Provides an implementation of the OAuth 2.0 and OpenID Connect (OIDC) protocols for ASP.NET Core
+  - **OAuth2.0 Authentication ( console cloud google ) The OAuth 2.0 token ensures that the request sent through Ocelot is authenticated and authorized to access the downstream API.
 
 ## Prerequisites
 - [.NET 6 SDK](https://dotnet.microsoft.com/download/dotnet/6.0)
